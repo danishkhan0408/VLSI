@@ -1,0 +1,60 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity USR is
+    Port 
+     (
+              rst : in  STD_LOGIC;
+           clk : in  STD_LOGIC;
+           mode : in  STD_LOGIC_VECTOR (1 downto 0);
+           Sin : in  STD_LOGIC;
+           Pin : in  STD_LOGIC_VECTOR (3 downto 0);
+           Sout : out  STD_LOGIC;
+           Pout : out  STD_LOGIC_VECTOR (3 downto 0)
+     );
+end USR;
+
+architecture USR_arch of USR is
+
+    SIGNAL t : STD_LOGIC_VECTOR (3 downto 0):="0000";
+    SIGNAL s : STD_LOGIC :='0';
+
+begin
+
+        PROCESS(rst,clk,mode,Sin,Pin)
+        BEGIN
+            IF rst = '0' THEN
+                Sout<='0';
+                Pout<="0000";
+                t<="0000";
+            ELSIF falling_edge(clk) THEN
+                CASE mode IS
+                    WHEN "00" =>
+                        t(3 downto 1)<=t(2 downto 0);
+                        t(0)<=Sin;
+                        Sout<=t(3);
+                        Pout<="0000";
+                        s<='0';
+                    WHEN "01" =>
+                        t(3  downto 1)<=t(2 downto 0);
+                        t(0)<=Sin;
+                        Pout<=t;
+                        Sout<='0';
+                        s<='0';
+                    WHEN "10" =>
+                        IF s='0' THEN
+                            t<=Pin;
+                        ELSE
+                            Sout<=t(3);
+                            t(3 downto 1)<=t(2 downto 0);
+                        END IF;
+                        s<='1';
+                    WHEN OTHERS =>
+                        t<=Pin;
+                        Pout<=t;
+                        s<='0';
+                END CASE;
+            END IF;
+        END PROCESS;
+end USR_arch;

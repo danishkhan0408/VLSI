@@ -1,0 +1,43 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+
+entity alu4_addsub is
+     Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           F : in  STD_LOGIC_VECTOR (2 downto 0);
+           Y : out  STD_LOGIC_VECTOR (3 downto 0);
+              carry_sign : out STD_LOGIC);
+end alu4_addsub;
+
+architecture alu4_addsub_arch of alu4_addsub is
+
+SIGNAL result : STD_LOGIC_VECTOR(4 downto 0):="00000";
+
+begin
+
+PROCESS(A,B,F)
+    BEGIN
+
+        CASE F IS
+
+            WHEN "000" => result<= '0' & (A AND B)  ;
+            WHEN "001" => result<= '0' & (A NAND B) ;
+            WHEN "010" => result<= '0' & (A OR B)   ;
+            WHEN "011" => result<= '0' & (A NOR B) ;
+            WHEN "100" => result<= '0' & (A XOR B) ;
+            WHEN "101" => result<= '0' & (A XNOR B) ;
+            WHEN "110" => 
+            result<=('0' & A) + ('0' & B);
+            WHEN OTHERS =>
+                IF A<B THEN
+                    result<= ( NOT( ('0' & A ) + ('0' & NOT(B) ) + 1 )  )+1 ;  -- result<= not( ('0'& A) + ('0' & not(B)+1 ) )+1;
+                ELSE
+                    result<= ('0' & A) - ('0' & B);
+                END IF;
+        END CASE;
+    END PROCESS;
+        Y<=result(3 downto 0);
+        carry_sign<=result(4);
+end alu4_addsub_arch;

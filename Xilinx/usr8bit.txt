@@ -1,0 +1,167 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity usr_8 is
+ Port(
+ Sin: in STD_LOGIC;
+ Pin: in STD_LOGIC_VECTOR (7 downto 0);
+ Sout: out STD_LOGIC;
+ Pout: out STD_LOGIC_VECTOR (7 downto 0);
+ clk: in STD_LOGIC;
+ rst: in STD_LOGIC;
+ mode: in STD_LOGIC_VECTOR (1 downto 0));
+end usr_8;
+
+architecture usr_8_arch of usr_8 is
+signal p0: std_logic_vector(7 downto 0);
+signal count:integer range 0 to 8:=0;
+
+begin
+
+	process(rst,clk,mode)
+		begin
+			if rst ='1' then
+				Sout<='0';
+				p0<="00000000";
+			elsif falling_edge(clk) then
+				case mode is
+					when "00" =>
+						Sout<= p0(0);
+						p0 <= Sin & p0(7 downto 1);
+						Pout <= "00000000";
+					when "01" =>
+						p0 <= Sin & p0(7 downto 1);
+						Sout <= '0';
+						Pout <= p0;
+					when "10" =>
+						Pout <= "00000000";
+						if count = 0 then
+							p0 <= Pin;
+							Sout <= '0';
+							count<=count+1;
+						elsif count <8 then
+							Sout<=p0(0);
+							p0(6 downto 0) <= p0(7 downto 1);
+							count<=count+1;
+						else
+							Sout<=p0(7);
+						end if;
+					when others =>
+						p0 <= Pin;
+						Sout<='0';
+						Pout<=p0;
+					end case;
+				end if;
+		end process;
+
+
+end usr_8_arch;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+ENTITY usr_8_tb IS
+END usr_8_tb;
+ 
+ARCHITECTURE behavior OF usr_8_tb IS 
+
+    -- Component Declaration for the Unit Under Test (UUT)
+ 
+    COMPONENT usr_8
+    PORT(
+		Sin: in STD_LOGIC;
+		Pin: in STD_LOGIC_VECTOR (7 downto 0);
+		Sout: out STD_LOGIC;
+		Pout: out STD_LOGIC_VECTOR (7 downto 0);
+		clk: in STD_LOGIC;
+		rst: in STD_LOGIC;
+		mode: in STD_LOGIC_VECTOR (1 downto 0)
+		);
+    END COMPONENT;
+    
+
+--Inputs
+signal Sin : STD_LOGIC :='0';
+signal Pin : STD_LOGIC_VECTOR (7 downto 0):="10110000";
+signal clk: STD_LOGIC;
+signal rst: STD_LOGIC:='1';
+signal mode: STD_LOGIC_VECTOR (1 downto 0):= (others => '0');
+
+--Outputs
+signal Sout : STD_LOGIC;
+signal Pout: STD_LOGIC_VECTOR (7 downto 0):= (others => '0'); 
+
+--Clock
+   constant clk_period : time := 10 ns;
+
+
+BEGIN
+
+ 
+	-- Instantiate the Unit Under Test (UUT)
+   uut: usr_8 PORT MAP (
+	Sin => Sin,
+	Pin => Pin,
+	Sout => Sout,
+	Pout => Pout,
+	clk => clk,
+	rst => rst,
+   mode => mode
+        );
+
+   -- Clock process definitions
+   clk_process :process
+   begin
+		clk <= '0';
+		wait for clk_period/2;
+		clk <= '1';
+		wait for clk_period/2;
+   end process;
+ 
+
+stim_proc_rst: process
+	begin
+		rst<='1';
+		wait for 50 ns;
+		rst<='0';
+		wait for 360 ns;
+end process;
+
+stim_proc_mode: process
+	begin
+	wait for 50 ns;
+	mode<="00";
+	wait for 160 ns;
+	mode<="01";
+	wait for 90 ns;
+	mode<="10";
+	wait for 90 ns;
+	mode<="11";
+	wait for 20 ns;
+end process;
+
+stim_proc_Sin: process
+begin
+Sin<=not(Sin);
+wait for 25ns;
+end process;
+END;

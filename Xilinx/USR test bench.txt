@@ -1,0 +1,108 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_unsigned.ALL; 
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--USE ieee.numeric_std.ALL;
+ 
+ENTITY USR_tb IS
+END USR_tb;
+ 
+ARCHITECTURE behavior OF USR_tb IS 
+ 
+    -- Component Declaration for the Unit Under Test (UUT)
+ 
+    COMPONENT USR
+    PORT(
+         rst : IN  std_logic;
+         clk : IN  std_logic;
+         mode : IN  std_logic_vector(1 downto 0);
+         Sin : IN  std_logic;
+         Pin : IN  std_logic_vector(3 downto 0);
+         Sout : OUT  std_logic;
+         Pout : OUT  std_logic_vector(3 downto 0)
+        );
+    END COMPONENT;
+    
+
+   --Inputs
+   signal rst : std_logic := '0';
+   signal clk : std_logic := '0';
+   signal mode : std_logic_vector(1 downto 0) := (others => '0');
+   signal Sin : std_logic := '0';
+   signal Pin : std_logic_vector(3 downto 0) := "1001";
+
+ 	--Outputs
+   signal Sout : std_logic;
+   signal Pout : std_logic_vector(3 downto 0);
+
+   -- Clock period definitions
+   constant clk_period : time := 10 ns;
+ 
+BEGIN
+ 
+	-- Instantiate the Unit Under Test (UUT)
+   uut: USR PORT MAP (
+          rst => rst,
+          clk => clk,
+          mode => mode,
+          Sin => Sin,
+          Pin => Pin,
+          Sout => Sout,
+          Pout => Pout
+        );
+
+   -- Clock process definitions
+   clk_process :process
+   begin
+		clk <= '0';
+		wait for clk_period/2;
+		clk <= '1';
+		wait for clk_period/2;
+   end process;
+ 
+
+   -- Stimulus process
+   stim_procRST: process
+   begin		
+      rst<='1';
+      wait for 300 ns;	
+		rst<='0';
+		wait for 10 ns;
+   end process;
+	
+	stim_procmode: process
+   begin		
+      mode<="00";
+	   Wait for 80 ns;
+		mode<="01";
+		Wait for 50 ns;
+		mode<="10";
+		Wait for 50 ns;
+		mode<="11";
+		Wait for 20 ns;
+  end process;
+	
+	stim_procSin: process
+   begin
+		wait for 10 ns;
+      Sin<='1';
+      wait for 10 ns;	
+		Sin<='0';
+		wait for 10 ns;
+		Sin<='1';
+		wait for 10 ns;
+		Sin<='0';
+		wait for 10 ns;
+		Sin<='0';
+		wait for 60 ns;
+      Sin<='1';
+      wait for 10 ns;	
+		Sin<='0';
+		wait for 10 ns;
+		Sin<='1';
+		wait for 10 ns;
+		Sin<='0';
+		end process;
+	
+END;

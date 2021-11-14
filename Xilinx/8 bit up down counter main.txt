@@ -1,0 +1,42 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity counter_8bit is
+    Port 
+     ( rst : in  STD_LOGIC;
+           pr : in  STD_LOGIC;
+           clk : in  STD_LOGIC;
+           mode : in  STD_LOGIC;
+           Q : out  STD_LOGIC_VECTOR (7 downto 0)
+     );
+end counter_8bit;
+
+architecture counter_8bit_arch of counter_8bit is
+
+        SIGNAL Qtemp :  STD_LOGIC_VECTOR (7 downto 0):=x"00";
+
+begin
+
+        PROCESS(rst,pr,clk,mode)
+        BEGIN
+            IF rst='1' THEN
+                Qtemp<=X"00";
+            ELSIF pr='1' THEN
+                Qtemp<=X"FF";
+            ELSIF falling_edge(clk) THEN
+
+                CASE mode IS
+
+                        WHEN '1' => Qtemp <= Qtemp+1;
+
+                        WHEN OTHERS => Qtemp <= Qtemp-1;
+
+                END CASE;
+            END IF;
+        END PROCESS;
+
+        Q<=Qtemp;
+
+end counter_8bit_arch;

@@ -1,0 +1,85 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+ 
+ENTITY counter_8bit_tb IS
+END counter_8bit_tb;
+ 
+ARCHITECTURE behavior OF counter_8bit_tb IS 
+ 
+    -- Component Declaration for the Unit Under Test (UUT)
+ 
+    COMPONENT counter_8bit
+    PORT(
+         rst : IN  std_logic;
+         pr : IN  std_logic;
+         clk : IN  std_logic;
+         mode : IN  std_logic;
+         Q : OUT  std_logic_vector(7 downto 0)
+        );
+    END COMPONENT;
+
+
+   --Inputs
+   signal rst : std_logic := '0';
+   signal pr : std_logic := '0';
+   signal clk : std_logic := '0';
+   signal mode : std_logic := '0';
+
+     --Outputs
+   signal Q : std_logic_vector(7 downto 0);
+
+   -- Clock period definitions
+   constant clk_period : time := 25 ns;
+ 
+BEGIN
+ 
+    -- Instantiate the Unit Under Test (UUT)
+   uut: counter_8bit PORT MAP (
+          rst => rst,
+          pr => pr,
+          clk => clk,
+          mode => mode,
+          Q => Q
+        );
+
+   -- Clock process definitions
+   clk_process :process
+   begin
+        clk <= '0';
+        wait for clk_period/2;
+        clk <= '1';
+        wait for clk_period/2;
+   end process;
+ 
+
+   -- Stimulus process
+   stim_procRST: process
+   begin
+      WAIT FOR 67 NS;
+        rst<='1';
+        wait for 35 ns;
+        rst<='0';
+      wait;
+   end process;
+
+    -- Stimulus process
+   stim_procPR: process
+   begin
+      WAIT FOR 132 NS;
+        pr<='1';
+        wait for 35 ns;
+        pr<='0';
+      wait;
+   end process;
+
+    -- Stimulus process
+   stim_procMODE: process
+   begin
+      mode<=NOT(mode);
+        wait for 200 ns;
+   end process;
+
+END;

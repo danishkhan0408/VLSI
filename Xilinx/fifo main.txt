@@ -1,0 +1,61 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity FIFO is
+    Port 
+     ( 
+            data_in : in  STD_LOGIC_VECTOR (7 downto 0);
+         rst : in  STD_LOGIC;
+         clk : in  STD_LOGIC;
+         wr_en : in  STD_LOGIC;
+            addr : in  STD_LOGIC_VECTOR (1 downto 0);
+         data_out : out  STD_LOGIC_VECTOR (7 downto 0);
+         empty : inout  STD_LOGIC;
+         full : inout  STD_LOGIC);
+end FIFO;
+
+architecture FIFO_ARCH of FIFO is
+    TYPE MEMORY IS ARRAY(0 TO 3) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL MEM : MEMORY:=(X"00",X"00",X"00",X"00");
+    CONSTANT all_zeros : MEMORY :=(others => (others=>'0'));
+begin
+    PROCESS(data_in,rst,clk,wr_en,addr,empty,full)
+    BEGIN
+
+        IF rst='1' THEN
+            data_out<=X"00";
+            MEM<=(X"00",X"00",X"00",X"00");
+            empty<='1';
+            full<='0';
+        ELSIF FALLING_EDGE(clk) THEN
+            IF (MEM(0)/=X"00") AND (MEM(1)/=X"00") AND (MEM(2)/=X"00") AND (MEM(3)/=X"00") THEN
+                empty<='0';
+                full<='1';
+            ELSE 
+                empty<='0';
+                full<='0';
+            END IF;
+
+            IF wr_en='1' THEN   --WRITE
+                CASE addr IS
+                    WHEN "00" => MEM(0)<=data_in;
+                    WHEN "01" => MEM(1)<=data_in;
+                    WHEN "10" => MEM(2)<=data_in;
+                    WHEN OTHERS => MEM(3)<=data_in;
+                END CASE;
+            ELSE                --READ
+                CASE addr IS
+                    WHEN "00" => data_out<=MEM(0);-- MEM(0)<=X"00";
+                    WHEN "01" => data_out<=MEM(1);-- MEM(1)<=X"00";
+                    WHEN "10" => data_out<=MEM(2);-- MEM(2)<=X"00";
+                    WHEN OTHERS => data_out<=MEM(3);-- MEM(3)<=X"00";
+                END CASE;
+            END IF;
+        END IF;
+
+    END PROCESS;
+end FIFO_ARCH;
+
+
